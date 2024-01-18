@@ -1,2 +1,2 @@
-.idea
-.gradle
+node_modules/
+.env
