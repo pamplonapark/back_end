@@ -1,14 +1,18 @@
 const xml2js = require("xml2js");
+const { logger } = require("../functions/logger");
 
 const parseXMLData = async (data) => {
-  const parser = new xml2js.Parser({ attrkey: "ATTR" });
+  return new Promise((resolve, reject) => {
+    const parser = new xml2js.Parser({ attrkey: "ATTR" });
 
-  parser.parseString(data, async function (error, result) {
-    if (error) {
-      console.error(`Error parsing XML: ${error}`);
-    } else {
-      return JSON.stringify(result);
-    }
+    parser.parseString(data, (error, result) => {
+      if (error) {
+        logger.error(`Error parsing XML input: ${error}`);
+        reject();
+      } else {
+        resolve(result);
+      }
+    });
   });
 };
 

@@ -12,6 +12,7 @@ const {
 const {
   initNeo4jDatabase,
 } = require("./src/internal/databases/neo4j_connector");
+const activateWorkerManager = require("./src/internal/functions/WorkerManager.js");
 
 app.use(helmet());
 app.use(bodyParser.json());
@@ -50,6 +51,7 @@ app.use("*", (req, res) => {
 app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, async () => {
   initMySQLDatabase();
   await initNeo4jDatabase();
+  activateWorkerManager();
 
   logger.info("Starting server on port " + process.env.SERVER_PORT);
 });
