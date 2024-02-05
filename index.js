@@ -6,8 +6,12 @@ const morgan = require("morgan");
 const logger = require("./src/internal/functions/logger");
 const app = express();
 require("dotenv").config();
-const { initMySQLDatabase } = require("./src/internal/databases/mysql_connector");
-const { initNeo4jDatabase } = require("./src/internal/databases/neo4j_connector");
+const {
+  initMySQLDatabase,
+} = require("./src/internal/databases/mysql_connector");
+const {
+  initNeo4jDatabase,
+} = require("./src/internal/databases/neo4j_connector");
 
 app.use(helmet());
 app.use(bodyParser.json());
@@ -43,9 +47,9 @@ app.use("*", (req, res) => {
 });
 
 /* Starting the server */
-app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, () => {
+app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, async () => {
   initMySQLDatabase();
-  initNeo4jDatabase();
+  await initNeo4jDatabase();
 
   logger.info("Starting server on port " + process.env.SERVER_PORT);
 });

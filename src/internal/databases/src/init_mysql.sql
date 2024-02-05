@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS pamplonapark_users;
-USE pamplonapark_users;
+CREATE DATABASE IF NOT EXISTS pamplonapark;
+USE pamplonapark;
 
 /* Log table */
-CREATE TABLE Logs_ (
+CREATE TABLE IF NOT EXISTS Logs_ (
   log_id INT AUTO_INCREMENT PRIMARY KEY,
   table_affected VARCHAR(255) NOT NULL,
   action_performed VARCHAR(255) NOT NULL,

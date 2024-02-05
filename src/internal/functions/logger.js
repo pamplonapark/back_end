@@ -4,30 +4,36 @@ const { combine, timestamp, printf, colorize, align } = winston.format;
 winston.addColors({
   database: "cyan",
   info: "green",
-  error: "red"
+  error: "red",
 });
 
 const logger = winston.createLogger({
   levels: {
     ...winston.config.npm.levels,
-    database: 1
+    database: 1,
   },
   format: combine(
     timestamp({
-      format: 'YYYY-MM-DD hh:mm:ss.SSS A',
+      format: "YYYY-MM-DD hh:mm:ss.SSS A",
     }),
     align(),
-    printf((info) => `[${info.timestamp}] ${info.level}: '${info.message.trim()}'`)
+    printf(
+      (info) => `[${info.timestamp}] ${info.level}: '${info.message.trim()}'`
+    )
   ),
   transports: [
-    new winston.transports.Console({ // Remove in production
+    new winston.transports.Console({
+      // Remove in production
       format: combine(
         colorize(),
         timestamp({
-          format: 'YYYY-MM-DD hh:mm:ss.SSS A',
+          format: "YYYY-MM-DD hh:mm:ss.SSS A",
         }),
         align(),
-        printf((info) => `[${info.timestamp}] ${info.level}: '${info.message.trim()}'`)
+        printf(
+          (info) =>
+            `[${info.timestamp}] ${info.level}: '${info.message.trim()}'`
+        )
       ),
     }),
     new winston.transports.File({
@@ -39,7 +45,7 @@ const logger = winston.createLogger({
       level: "database",
     }),
     new winston.transports.File({
-      filename: "logs/combined.log"
+      filename: "logs/combined.log",
     }),
   ],
 });
