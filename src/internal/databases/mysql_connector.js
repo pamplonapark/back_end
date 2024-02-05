@@ -21,11 +21,11 @@ const initMySQLDatabase = () => {
     charset: "utf8mb4",
     connectTimeout: 10000,
     dateStrings: false,
-    database: "pamplonapark_users",
-    queueLimit: 0 // No limit regarding queued connections -> Auto handler for multiple requests at once
+    database: "pamplonapark",
+    queueLimit: 0, // No limit regarding queued connections -> Auto handler for multiple requests at once
   });
 
-  pool.on('enqueue', () => {
+  pool.on("enqueue", () => {
     logger.log("database", `Connection in queue`);
   });
 
@@ -34,18 +34,22 @@ const initMySQLDatabase = () => {
   });
 
   pool.on("release", (connection) => {
-    logger.log("database", `Connection ${connection.threadId} returned to the pool`);
+    logger.log(
+      "database",
+      `Connection ${connection.threadId} returned to the pool`
+    );
   });
 
   // Test correct MySQL connection
   pool.getConnection((err, connection) => {
-    if (err) {
-      logger.log("database", `Error stablishing pool: ${err}`);
+    if (err || connection == null) {
+      logger.log("error", `Error stablishing pool - ${err}`);
+      logger.log("database", `Error stablishing pool - ${err}`);
     } else {
       logger.log("database", `Connection to database stablished correctly`);
-    }
 
-    connection.release();
+      connection.release();
+    }
   });
 };
 
@@ -56,9 +60,9 @@ const executeQuery = (sql, values) => {
     connection.execute(sql, values, (err, results, fields) => {
       connection.release();
 
-      if (err) logger.log("error", "Error in SQL execute: " + err);
+      if (err) logger.log("error", "Error in SQL execute - " + err);
       else {
-        logger.log("database", "Query executed correctly: " + sql);
+        logger.log("database", "Query executed correctly - " + sql);
         return [results, fields];
       }
       return;
@@ -68,9 +72,9 @@ const executeQuery = (sql, values) => {
 
 const closePool = () => {
   pool.end((err) => {
-    if (err) logger.log("error", "Error closing pool: " + err);
+    if (err) logger.log("error", "Error closing pool - " + err);
     else logger.log("database", "Pool closed correctly");
   });
-}
+};
 
 module.exports = { initMySQLDatabase, executeQuery, closePool };

@@ -1,4 +1,4 @@
-USE pamplonapark_users;
+USE pamplonapark;
 
 INSERT IGNORE INTO Logs_ (table_affected, action_performed, user_affected, explanation) 
 VALUES ('Users_', 'INSERT', 'admin', 'Inserted new user record'),
