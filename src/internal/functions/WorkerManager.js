@@ -4,13 +4,18 @@ const { Worker } = require("worker_threads");
 const activateWorkerManager = () => {
   logger.info("Worker Manager activated");
 
-  const createWorker = () => {
+  const createUndergroundParkingUpdaterWorker = () => {
     const worker = new Worker(
       "./src/internal/functions/updateUndergroundParkings.js",
       {
         name: "Parking Updater",
       }
     );
+
+    if (worker != null)
+      logger.info(
+        "WorkerManager - Worker created correctly (updateUndergroundParkings)"
+      );
 
     worker.on("message", (message) => {
       logger.info(`WorkerManager - Received message from worker: ${message}`);
@@ -30,10 +35,7 @@ const activateWorkerManager = () => {
   };
 
   setInterval(() => {
-    createWorker();
-    logger.info(
-      "WorkerManager - Worker created correctly (updateUndergroundParkings)"
-    );
+    createUndergroundParkingUpdaterWorker();
   }, 300000); //5 minutes in milliseconds
 };
 

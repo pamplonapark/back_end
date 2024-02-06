@@ -6,7 +6,7 @@
   "scripts": {
     "test": "nodemon --config nodemon.json index.js",
     "start": "node index.js",
-    "test_neo4j": "nodemon --config nodemon.json src/internal/functions/WorkerManager.js"
+    "test_neo4j": "nodemon --config nodemon.json src/internal/functions/updateUndergroundParkings.js"
   },
   "author": "",
   "license": "ISC",
