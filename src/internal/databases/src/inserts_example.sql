@@ -1,17 +1,5 @@
 USE pamplonapark;
 
-INSERT IGNORE INTO Logs_ (table_affected, action_performed, user_affected, explanation) 
-VALUES ('Users_', 'INSERT', 'admin', 'Inserted new user record'),
-       ('Users_', 'UPDATE', 'user123', 'Updated user information'),
-       ('Users_', 'DELETE', 'user456', 'Deleted user account'),
-       ('Favorites', 'INSERT', 'admin', 'Inserted new favorite record'),
-       ('Favorites', 'UPDATE', 'user789', 'Updated favorite information'),
-       ('Favorites', 'DELETE', 'user123', 'Deleted favorite'),
-       ('User_Favorite', 'INSERT', 'user789', 'Added favorite to user'),
-       ('User_Favorite', 'DELETE', 'user456', 'Removed favorite from user'),
-       ('User_Favorite', 'UPDATE', 'user123', 'Updated user favorite'),
-       ('User_Favorite', 'INSERT', 'user456', 'Added new user favorite');
-
 INSERT IGNORE INTO Users_ (id, username, email, password_) 
 VALUES ('1', 'admin', 'admin@example.com', 'admin123'),
        ('2', 'user123', 'user123@example.com', 'user123pass'),

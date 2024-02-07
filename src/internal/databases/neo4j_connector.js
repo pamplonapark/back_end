@@ -1,6 +1,6 @@
 const neo4j = require("neo4j-driver");
 const logger = require("../functions/logger");
-require("dotenv");
+require("dotenv").config();
 
 let driver;
 
@@ -28,7 +28,12 @@ const initNeo4jDatabase = async () => {
   }
 };
 
-const executeQuery = (query, params) => {
+/**
+ * @param query : Query (String)
+ * @param params : Parameters (Object)
+ * @param printError : Print if error or not (Boolean)
+ */
+const executeQuery = (query, params, printError = true) => {
   const session = driver.session({ database: "pamplonapark" });
 
   return session
@@ -38,20 +43,27 @@ const executeQuery = (query, params) => {
       return result.records;
     })
     .catch((error) => {
-      logger.log("database", `Neo4j: Error in query: ${error.message}`);
+      if (!printError) {
+        logger.log("database", `Neo4j: Error in query: ${error.message}`);
+        logger.error(`Neo4j: Error in query: ${error.message}`);
+      }
     })
     .finally(() => {
       return session.close();
     });
 };
 
+/**
+ * @param query : Query (String)
+ * @param params : Parameters (Object)
+ */
 const insertQuery = (query, params) => {
-  const session = driver.session({ database: "pamplonapark" });
+  const session = driver.session();
 
   return session
     .writeTransaction((tx) => tx.run(query, params))
     .then((result) => {
-      logger.log("database", `Neo4j: Query executed: ${sql}`);
+      logger.log("database", `Neo4j: Query executed: ${query}`);
       return result.records;
     })
     .catch((error) => {
