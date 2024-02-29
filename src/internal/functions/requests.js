@@ -1,7 +1,7 @@
 const http = require("http");
-const https = require("https");
+const logger = require("./logger");
 
-/* REGISTER */
+/* HTTP REQUEST */
 const requestHTTP = (
   host,
   path,
@@ -27,7 +27,7 @@ const requestHTTP = (
     );
 
     request.on("error", (err) => {
-      console.log(err);
+      logger.error(`Error creating HTTP connection: ${err.stack}`);
       reject(err);
     });
 
@@ -35,38 +35,4 @@ const requestHTTP = (
   });
 };
 
-/* REGISTER */
-const requestHTTPS = (
-  host,
-  path,
-  method,
-  headers = { accept: "application/json", "Content-Type": "application/json" }
-) => {
-  return new Promise((resolve, reject) => {
-    const request = https.request(
-      {
-        host: host,
-        path: path,
-        method: method,
-        headers: headers,
-      },
-      (response) => {
-        let chunks = [];
-        response.on("data", (data) => chunks.push(data));
-
-        response.on("end", () => {
-          resolve(Buffer.concat(chunks).toString());
-        });
-      }
-    );
-
-    request.on("error", (err) => {
-      console.log(err);
-      reject(err);
-    });
-
-    request.end();
-  });
-};
-
-module.exports = { requestHTTP, requestHTTPS };
+module.exports = { requestHTTP };

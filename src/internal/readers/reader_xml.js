@@ -7,8 +7,8 @@ const parseXMLData = async (data) => {
 
     parser.parseString(data, (error, result) => {
       if (error) {
-        logger.error(`Error parsing XML input: ${error}`);
-        reject();
+        logger.error(`Error parsing XML input: ${error.stack}`);
+        reject(error);
       } else {
         resolve(result);
       }

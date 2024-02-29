@@ -22,13 +22,12 @@ const activateWorkerManager = () => {
     });
 
     worker.on("error", (error) => {
-      logger.error(`WorkerManager - Error in worker: ${error.message}`);
+      logger.error(`WorkerManager - Error in worker: ${error.stack}`);
     });
 
     worker.on("exit", (code) => {
       logger.info(
-        `WorkerManager - Worker exit status: ${
-          code == 0 ? "Successful" : "Error"
+        `WorkerManager - Worker exit status: ${code == 0 ? "Successful" : "Error"
         }`
       );
     });
