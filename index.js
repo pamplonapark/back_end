@@ -5,14 +5,12 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const logger = require("./src/internal/functions/logger");
 const app = express();
-require("dotenv").config();
 const {
   initMySQLDatabase,
 } = require("./src/internal/databases/mysql_connector");
-const {
-  initNeo4jDatabase,
-} = require("./src/internal/databases/neo4j_connector");
 const activateWorkerManager = require("./src/internal/functions/WorkerManager.js");
+const { generateRandomAESKey } = require("./src/internal/functions/crypto");
+require("dotenv").config({ path: `${__dirname}/config.env`, override: true });
 
 app.use(helmet());
 app.use(bodyParser.json());
@@ -24,8 +22,8 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "jade");
-
-//app.use("/account/v1", require("./src/routes/account.js"));
+app.use("/parkings", require("./src/routes/parkings.js"));
+app.use("/accounts", require("./src/routes/accounts.js"));
 
 /* IF 404 PETITION IS SENT */
 app.use("*", (req, res) => {
@@ -47,11 +45,20 @@ app.use("*", (req, res) => {
   res.type("txt").status(404).send("Code 404 - Bad request - Not found");
 });
 
+let port = process.env.SERVER_PORT;
+
+if (process.env.ENVIRONMENT == "development") port = process.env.SERVER_PORT_DEV;
+
 /* Starting the server */
-app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, async () => {
+app.listen(port, process.env.SERVER_IP, async () => {
   initMySQLDatabase();
-  await initNeo4jDatabase();
   activateWorkerManager();
 
-  logger.info("Starting server on port " + process.env.SERVER_PORT);
+  if (process.env.ENVIRONMENT == "development") {
+    // insertInitialData();
+    generateRandomAESKey();
+    logger.info("WORKING IN DEVELOPMENT MODE");
+  } else logger.info("WORKING IN PRODUCTION MODE");
+
+  logger.info("Starting server on port " + port);
 });

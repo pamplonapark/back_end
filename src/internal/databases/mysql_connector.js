@@ -1,6 +1,5 @@
 const mysql = require("mysql2");
 const logger = require("../functions/logger");
-require("dotenv");
 
 let pool;
 
@@ -12,12 +11,22 @@ const initMySQLDatabase = () => {
     pool.removeListener("release");
   }
 
+  let mysql_user = process.env.MYSQL_USER;
+  let mysql_password = process.env.MYSQL_PASSWORD;
+  let mysql_port = process.env.MYSQL_PORT;
+
+  if (process.env.ENVIRONMENT == "development") {
+    mysql_user = process.env.MYSQL_USER_DEV;
+    mysql_password = process.env.MYSQL_PASSWORD_DEV;
+    mysql_port = process.env.MYSQL_PORT_DEV;
+  }
+
   pool = mysql.createPool({
     connectionLimit: 100,
     host: "localhost",
-    port: process.env.MYSQL_PORT,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
+    port: mysql_port,
+    user: mysql_user,
+    password: mysql_password,
     charset: "utf8mb4",
     connectTimeout: 10000,
     dateStrings: false,
@@ -51,27 +60,38 @@ const initMySQLDatabase = () => {
       connection.release();
     }
   });
+
+  return pool;
 };
 
-const executeQuery = (sql, values) => {
-  pool.getConnection((err, connection) => {
-    if (err) logger.log("error", "Error in database connection: " + err);
+const executeQuery = (sql, values, sub_pool = null) => {
+  let tem_pool = sub_pool;
 
-    connection.execute(sql, values, (err, results, fields) => {
-      connection.release();
+  if (!tem_pool) tem_pool = pool;
 
-      if (err) logger.log("error", "Error in SQL execute - " + err);
-      else {
-        logger.log("database", "Query executed correctly - " + sql);
-        return [results, fields];
-      }
-      return;
+  return new Promise(async (resolve, reject) => {
+    tem_pool.getConnection((err, connection) => {
+      if (err) logger.log("error", "Error in database connection: " + err);
+
+      connection.execute(sql, values, (err, results, fields) => {
+        connection.release();
+
+        if (err) reject(logger.log("error", "Error in SQL execute - " + err));
+        else {
+          logger.log("database", "Query executed correctly - " + sql);
+          resolve([results, fields]);
+        }
+      });
     });
   });
 };
 
-const closePool = () => {
-  pool.end((err) => {
+const closePool = (sub_pool = null) => {
+  let tem_pool = sub_pool;
+
+  if (tem_pool == null) tem_pool = pool;
+
+  tem_pool.end((err) => {
     if (err) logger.log("error", "Error closing pool - " + err);
     else logger.log("database", "Pool closed correctly");
   });

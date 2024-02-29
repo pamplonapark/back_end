@@ -22,11 +22,6 @@ CREATE TABLE IF NOT EXISTS Users_(
     last_modification_date TIMESTAMP DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Favorites(
-	id BIGINT PRIMARY KEY,
-	uuid CHAR(36) DEFAULT (UUID()) UNIQUE
-);
-
 CREATE TABLE IF NOT EXISTS User_Favorite(
 	id_user BIGINT,
     id_favorite BIGINT,
@@ -35,8 +30,21 @@ CREATE TABLE IF NOT EXISTS User_Favorite(
     PRIMARY KEY(id_user, id_favorite)
 );
 
+CREATE TABLE IF NOT EXISTS Parkings(
+	id BIGINT PRIMARY KEY,
+	uuid CHAR(36) DEFAULT (UUID()) UNIQUE,
+	name VARCHAR(255),
+	address VARCHAR(255),
+	hours_active VARCHAR(255),
+	available_spots VARCHAR(255),
+	latitude VARCHAR(255),
+	spots VARCHAR(255),
+	telephone VARCHAR(255),
+	longitude VARCHAR(255)
+);
+
 ALTER TABLE User_Favorite ADD CONSTRAINT id_user FOREIGN KEY(id_user) REFERENCES Users_(id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE User_Favorite ADD CONSTRAINT id_favorite FOREIGN KEY(id_favorite) REFERENCES Favorites(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE User_Favorite ADD CONSTRAINT id_favorite FOREIGN KEY(id_favorite) REFERENCES Parkings(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 DROP TRIGGER IF EXISTS add_creation_date;
 DROP TRIGGER IF EXISTS add_modification_date;

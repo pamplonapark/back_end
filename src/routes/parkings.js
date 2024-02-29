@@ -1,19 +1,13 @@
 const express = require("express");
 const router = express.Router();
+// const {
+//   create_bearer_token,
+//   decode_bearer_token,
+// } = require("../internal/database/server/auth_bearer");
+// const { Users } = require("../internal/database/server/User");
 const logger = require("../internal/functions/logger");
-const { encrypt_aes, decrypt_aes } = require("../internal/functions/crypto");
-const { executeQuery } = require("../internal/databases/mysql_connector");
 
-router.post("/register", async (req, res) => {
-  let body_parsed = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
-
-  if (executeQuery("SELECT COUNT(*) FROM USERS_ WHERE user_ = ?",)) { }
-  //     let [encrypted, itv, authTag] = encrypt_aes("test");
-
-  //   res.status(200).send(
-  //     `<h1>Encrypted: ${encrypted}</h1>
-  //     <br><h1>Decrypted: ${decrypt_aes(encrypted, itv, authTag)}</h1>`
-  //   );
+router.get("/getAllParkings", async (req, res) => {
   /*executeQuery("MATCH (n:Parking) RETURN n", "", true).then((data) => {
     //console.log(data[0]._fields.Node);
     console.log(data[0]._fields[0].properties.name);
@@ -33,7 +27,5 @@ router.post("/register", async (req, res) => {
   } else logger.info("Token inválido");*/
   //decode_bearer_token(req.headers.authorization.split(" ")[1]);
 });
-
-router.post("/login", () => { });
 
 module.exports = router;
