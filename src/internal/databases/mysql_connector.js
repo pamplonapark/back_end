@@ -3,6 +3,13 @@ const logger = require("../functions/logger");
 
 let pool;
 
+/**
+ * Initializes MySQL database connection pool.
+ * It sets up event listeners for connection queue, acquisition, and release.
+ * Additionally, it tests the connection to ensure its correctness.
+ * 
+ * @returns {Pool} The MySQL connection pool.
+ */
 const initMySQLDatabase = () => {
   // If pool exists
   if (pool) {
@@ -63,7 +70,14 @@ const initMySQLDatabase = () => {
 
   return pool;
 };
-
+/**
+ * Executes a SQL query using the provided pool or the default one if not specified.
+ * 
+ * @param {string} sql - The SQL query to execute.
+ * @param {Array} values - Values to be inserted into the query.
+ * @param {Pool} [sub_pool=null] - Optional: The MySQL connection pool to use.
+ * @returns {Promise<Array>} A promise that resolves with an array containing the results and fields of the executed query.
+ */
 const executeQuery = (sql, values, sub_pool = null) => {
   let tem_pool = sub_pool;
 
@@ -86,6 +100,11 @@ const executeQuery = (sql, values, sub_pool = null) => {
   });
 };
 
+/**
+ * Closes the MySQL connection pool.
+ * 
+ * @param {Pool} [sub_pool=null] - Optional: The MySQL connection pool to close.
+ */
 const closePool = (sub_pool = null) => {
   let tem_pool = sub_pool;
 

@@ -10,20 +10,25 @@ const {
 } = require("./src/internal/databases/mysql_connector");
 const activateWorkerManager = require("./src/internal/functions/WorkerManager.js");
 const { generateRandomAESKey } = require("./src/internal/functions/crypto");
-require("dotenv").config({ path: `${__dirname}/config.env`, override: true });
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecs = require("./swagger-config.js");
 
-app.use(helmet());
-app.use(bodyParser.json());
-app.use(cors());
+require("dotenv").config({ path: `${__dirname}/.env`, override: true });
+
+app.use(helmet()); // Set various HTTP headers for security
+app.use(bodyParser.json()); // Parse incoming JSON requests
+app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(
   morgan("combined", {
-    stream: { write: (message) => logger.info(message.trim()) },
+    stream: { write: (message) => logger.info(message.trim()) }, // Log HTTP requests
   })
 );
-app.use(express.urlencoded({ extended: true }));
-app.set("view engine", "jade");
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded requests
+app.set("view engine", "jade"); // Set the view engine for rendering templates
+
 app.use("/parkings", require("./src/routes/parkings.js"));
 app.use("/accounts", require("./src/routes/accounts.js"));
+app.use("/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
 
 /* IF 404 PETITION IS SENT */
 app.use("*", (req, res) => {

@@ -1,7 +1,15 @@
 const http = require("http");
 const logger = require("./logger");
 
-/* HTTP REQUEST */
+/**
+ * Sends an HTTP request to the specified host and path.
+ * 
+ * @param {string} host - The host to send the request to.
+ * @param {string} path - The path of the request.
+ * @param {string} method - The HTTP method (e.g., GET, POST, PUT, DELETE).
+ * @param {Object} [headers={ accept: "application/json", "Content-Type": "application/json" }] - Optional: Headers for the HTTP request.
+ * @returns {Promise<string>} A promise that resolves with the response data.
+ */
 const requestHTTP = (
   host,
   path,
