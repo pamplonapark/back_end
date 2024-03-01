@@ -31,7 +31,7 @@ app.use("/accounts", require("./src/routes/accounts.js"));
 
 // Sets the user and password to access swagger documentation
 let admin_password = process.env.ADMIN_PASSWORD;
-if (environment == "development") admin_password = process.env.ADMIN_PASSWORD;
+if (environment == "development") admin_password = process.env.ADMIN_PASSWORD_DEV;
 app.use("/v1/docs", basicAuth({ users: { "admin": admin_password }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
 
 app.use("/v1/dashboard", (req, res) => res.redirect("https://app.pm2.io/")); // Redirection to dashboard

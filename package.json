@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --config nodemon.json index.js",
-    "start": "pm2 start ecosystem.config.js",
+    "start": "pm2 start ecosystem.config.js && pm2 link zxkn27nslt2t206 5sxb2d2gx554l9i",
     "logs": "pm2 logs",
     "list": "pm2 list",
     "stop": "pm2 stop pamplonapark",
