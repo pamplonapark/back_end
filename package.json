@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --config nodemon.json index.js",
-    "start": "node index.js",
-    "test_neo4j": "nodemon --config nodemon.json src/internal/functions/updateUndergroundParkings.js"
+    "start": "pm2 start ecosystem.config.js",
+    "logs": "pm2 logs",
+    "list": "pm2 list",
+    "stop": "pm2 stop pamplonapark",
+    "reload": "pm2 reload pamplonapark"
   },
   "author": "",
   "license": "ISC",

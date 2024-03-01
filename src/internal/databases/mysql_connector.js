@@ -101,16 +101,18 @@ const executeQuery = (sql, values, sub_pool = null) => {
 };
 
 /**
- * Closes the MySQL connection pool.
+ * Asynchronously closes the MySQL connection pool.
  * 
  * @param {Pool} [sub_pool=null] - Optional: The MySQL connection pool to close.
+ *                                If not provided, the default pool will be used.
+ * @returns {Promise<void>} A promise that resolves when the connection pool is closed.
  */
-const closePool = (sub_pool = null) => {
+const closePool = async (sub_pool = null) => {
   let tem_pool = sub_pool;
 
   if (tem_pool == null) tem_pool = pool;
 
-  tem_pool.end((err) => {
+  await tem_pool.end((err) => {
     if (err) logger.log("error", "Error closing pool - " + err);
     else logger.log("database", "Pool closed correctly");
   });

@@ -5,9 +5,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const logger = require("./src/internal/functions/logger");
 const app = express();
-const {
-  initMySQLDatabase,
-} = require("./src/internal/databases/mysql_connector");
+const { initMySQLDatabase, closePool } = require("./src/internal/databases/mysql_connector");
 const activateWorkerManager = require("./src/internal/functions/WorkerManager.js");
 const { generateRandomAESKey } = require("./src/internal/functions/crypto");
 const swaggerUi = require("swagger-ui-express");
@@ -31,10 +29,12 @@ app.set("view engine", "jade"); // Set the view engine for rendering templates
 app.use("/parkings", require("./src/routes/parkings.js"));
 app.use("/accounts", require("./src/routes/accounts.js"));
 
-let swagger_password = process.env.SWAGGER_PASSWORD;
-if (environment == "development") swagger_password = process.env.SWAGGER_PASSWORD_DEV;
+// Sets the user and password to access swagger documentation
+let admin_password = process.env.ADMIN_PASSWORD;
+if (environment == "development") admin_password = process.env.ADMIN_PASSWORD;
+app.use("/v1/docs", basicAuth({ users: { "admin": admin_password }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
 
-app.use("/v1/docs", basicAuth({ users: { "admin": swagger_password }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
+app.use("/v1/dashboard", (req, res) => res.redirect("https://app.pm2.io/")); // Redirection to dashboard
 
 /* IF 404 PETITION IS SENT */
 app.use("*", (req, res) => {
@@ -57,7 +57,6 @@ app.use("*", (req, res) => {
 });
 
 let port = process.env.SERVER_PORT;
-
 if (environment == "development") port = process.env.SERVER_PORT_DEV;
 
 /* Starting the server */
@@ -72,4 +71,8 @@ app.listen(port, process.env.SERVER_IP, async () => {
   } else logger.info("WORKING IN PRODUCTION MODE");
 
   logger.info("Starting server on port " + port);
+});
+
+process.on("SIGINT", async () => {
+  await closePool();
 });

@@ -32,9 +32,12 @@ const { executeQuery } = require("../internal/databases/mysql_connector");
  *         description: Invalid petition, incorrect params
  */
 router.post("/register", async (req, res) => {
-  let body_parsed = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
+  let body_parsed = JSON.parse(decrypt_aes(req.body.info, req.body.iv, req.body.authPath));
+  //let actual_user =
 
-  if (executeQuery("SELECT COUNT(*) FROM USERS_ WHERE user_ = ?", [])) { }
+  /*if (executeQuery("SELECT COUNT(*) FROM USERS_ WHERE user_ = ?", [])) {
+
+  }*/
   //     let [encrypted, itv, authTag] = encrypt_aes("test");
 
   //   res.status(200).send(
