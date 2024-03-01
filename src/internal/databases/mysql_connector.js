@@ -18,22 +18,12 @@ const initMySQLDatabase = () => {
     pool.removeListener("release");
   }
 
-  let mysql_user = process.env.MYSQL_USER;
-  let mysql_password = process.env.MYSQL_PASSWORD;
-  let mysql_port = process.env.MYSQL_PORT;
-
-  if (process.env.ENVIRONMENT == "development") {
-    mysql_user = process.env.MYSQL_USER_DEV;
-    mysql_password = process.env.MYSQL_PASSWORD_DEV;
-    mysql_port = process.env.MYSQL_PORT_DEV;
-  }
-
   pool = mysql.createPool({
     connectionLimit: 100,
     host: "localhost",
-    port: mysql_port,
-    user: mysql_user,
-    password: mysql_password,
+    port: process.env.MYSQL_PORT,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
     charset: "utf8mb4",
     connectTimeout: 10000,
     dateStrings: false,

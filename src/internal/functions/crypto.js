@@ -53,7 +53,7 @@ const decrypt_aes = (data, iv, certificate) => {
  * @returns {string} A randomly generated AES key in HEX format.
  */
 const generateRandomAESKey = () => {
-  if (process.env.ENVIRONMENT == "development")
+  if (process.env.NODE_ENV == "development")
     return crypto.randomBytes(32).toString("hex");
 };
 
