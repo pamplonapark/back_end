@@ -12,8 +12,10 @@ const activateWorkerManager = require("./src/internal/functions/WorkerManager.js
 const { generateRandomAESKey } = require("./src/internal/functions/crypto");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpecs = require("./swagger-config.js");
+const basicAuth = require('express-basic-auth');
 
 require("dotenv").config({ path: `${__dirname}/.env`, override: true });
+let environment = process.env.ENVIRONMENT;
 
 app.use(helmet()); // Set various HTTP headers for security
 app.use(bodyParser.json()); // Parse incoming JSON requests
@@ -28,7 +30,11 @@ app.set("view engine", "jade"); // Set the view engine for rendering templates
 
 app.use("/parkings", require("./src/routes/parkings.js"));
 app.use("/accounts", require("./src/routes/accounts.js"));
-app.use("/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
+
+let swagger_password = process.env.SWAGGER_PASSWORD;
+if (environment == "development") swagger_password = process.env.SWAGGER_PASSWORD_DEV;
+
+app.use("/v1/docs", basicAuth({ users: { "admin": swagger_password }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
 
 /* IF 404 PETITION IS SENT */
 app.use("*", (req, res) => {
@@ -52,14 +58,14 @@ app.use("*", (req, res) => {
 
 let port = process.env.SERVER_PORT;
 
-if (process.env.ENVIRONMENT == "development") port = process.env.SERVER_PORT_DEV;
+if (environment == "development") port = process.env.SERVER_PORT_DEV;
 
 /* Starting the server */
 app.listen(port, process.env.SERVER_IP, async () => {
   initMySQLDatabase();
   activateWorkerManager();
 
-  if (process.env.ENVIRONMENT == "development") {
+  if (environment == "development") {
     // insertInitialData();
     generateRandomAESKey();
     logger.info("WORKING IN DEVELOPMENT MODE");
