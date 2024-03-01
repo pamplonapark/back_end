@@ -4,10 +4,40 @@ const logger = require("../internal/functions/logger");
 const { encrypt_aes, decrypt_aes } = require("../internal/functions/crypto");
 const { executeQuery } = require("../internal/databases/mysql_connector");
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Creates a new user / log in a user
+ *     description: Creates a user / log in a user
+ *     requestBody:
+ *      required: true
+ *      content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the user
+ *               password:
+ *                 type: string
+ *                 description: The password in SHA-512
+ *     responses:
+ *       '200':
+ *         description: Creates the user and / or returns a Bearer token
+ *       '404':
+ *         description: Invalid petition, user already exists
+ *       '405':
+ *         description: Invalid petition, incorrect params
+ */
 router.post("/register", async (req, res) => {
-  let body_parsed = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
+  let body_parsed = JSON.parse(decrypt_aes(req.body.info, req.body.iv, req.body.authPath));
+  //let actual_user =
 
-  if (executeQuery("SELECT COUNT(*) FROM USERS_ WHERE user_ = ?",)) { }
+  /*if (executeQuery("SELECT COUNT(*) FROM USERS_ WHERE user_ = ?", [])) {
+
+  }*/
   //     let [encrypted, itv, authTag] = encrypt_aes("test");
 
   //   res.status(200).send(
@@ -33,7 +63,5 @@ router.post("/register", async (req, res) => {
   } else logger.info("Token inválido");*/
   //decode_bearer_token(req.headers.authorization.split(" ")[1]);
 });
-
-router.post("/login", () => { });
 
 module.exports = router;

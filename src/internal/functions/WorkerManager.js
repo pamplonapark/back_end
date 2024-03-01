@@ -1,6 +1,11 @@
 const logger = require("./logger");
 const { Worker } = require("worker_threads");
 
+/**
+ * Activates the worker manager to create and manage worker threads.
+ * 
+ * This function periodically creates worker threads to update underground parking data.
+ */
 const activateWorkerManager = () => {
   logger.info("Worker Manager activated");
 

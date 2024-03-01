@@ -10,6 +10,12 @@ const {
   closePool,
 } = require("../databases/mysql_connector");
 
+/**
+ * Updates the data of a parking lot in the MySQL database.
+ * 
+ * @param {Object} element - The parking lot data to be updated.
+ * @returns {Promise<Array>} A promise that resolves with the result of the database update query.
+ */
 const updateDataMySQL = async (element) => {
   return new Promise(async (resolve) => {
     resolve(
@@ -26,6 +32,12 @@ const updateDataMySQL = async (element) => {
   });
 };
 
+/**
+ * Updates the data of underground parkings in MySQL database.
+ * Retrieves data from an XML source, parses it, and updates the database accordingly.
+ * 
+ * @returns {Promise<void>} A promise that resolves when the update process is complete.
+ */
 const updateUndergroundParkings = async () => {
   const data = await requestHTTP(
     "parkings.pamplona.es",
@@ -61,6 +73,9 @@ const updateUndergroundParkings = async () => {
   parentPort.postMessage("Parkings updated correctly");
 };
 
+/**
+ * @deprecated - Dev only
+ */
 const insertInitialData = async () => {
   const data = await requestHTTP(
     "parkings.pamplona.es",
@@ -103,6 +118,9 @@ const insertInitialData = async () => {
   await Promise.all(insertData);
 };
 
+/**
+ * Updates the data of underground parkings in MySQL database if executed in a worker thread.
+ */
 if (parentPort != null) updateUndergroundParkings();
 
 module.exports = { insertInitialData };
