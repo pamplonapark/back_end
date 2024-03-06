@@ -83,6 +83,12 @@ const create_bearer_token = (uuid, password, username) => {
   );
 };
 
+/**
+ * Decodes the bearer token using the JWT token secret.
+ * 
+ * @param {string} bearer_token - The bearer token to decode.
+ * @returns {object|undefined} - The decoded token payload if successful, or undefined if an error occurs.
+ */
 const decode_bearer_token = (bearer_token) => {
   try {
     return jwt.decode(bearer_token, process.env.JWT_TOKEN);
@@ -93,6 +99,12 @@ const decode_bearer_token = (bearer_token) => {
   }
 };
 
+/**
+ * Checks if the bearer token is active based on the expiration time.
+ * 
+ * @param {number} exp - The expiration time of the bearer token.
+ * @returns {boolean} - True if the bearer token is active, false otherwise.
+ */
 const check_active_bearer = (exp) => {
   return exp <= moment().unix();
 };
