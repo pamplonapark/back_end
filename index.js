@@ -51,21 +51,18 @@ app.use("*", (req, res) => {
   res.type("txt").status(404).send("Code 404 - Bad request - Not found");
 });
 
-//let port = process.env.SERVER_PORT;
-//if (environment == "development") port = process.env.SERVER_PORT_DEV;
-
 /* Starting the server */
-app.listen(process.env.PORT, process.env.SERVER_IP, async () => {
+app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, async () => {
   initMySQLDatabase();
   activateWorkerManager();
 
   if (process.env.NODE_ENV == "development") {
     // insertInitialData();
-    generateRandomAESKey();
+    logger.info("Token: " + generateRandomAESKey());
     logger.info("WORKING IN DEVELOPMENT MODE");
   } else logger.info("WORKING IN PRODUCTION MODE");
 
-  logger.info("Starting server on port " + port);
+  logger.info("Starting server on port " + process.env.SERVER_PORT);
 });
 
 process.on("SIGINT", async () => {

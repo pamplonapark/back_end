@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pm2 start ecosystem.config.js --env development && pm2 link zxkn27nslt2t206 5sxb2d2gx554l9i",
+    "dev": "pm2 start ecosystem.config.js --env development && pm2 link zxkn27nslt2t206 5sxb2d2gx554l9i && pm2 monit",
     "start": "pm2 start ecosystem.config.js --env production && pm2 link zxkn27nslt2t206 5sxb2d2gx554l9i",
     "logs": "pm2 logs",
     "list": "pm2 list",
-    "stop": "pm2 stop pamplonapark",
+    "stop": "pm2 kill && pm2 stop all",
     "reload": "pm2 reload pamplonapark",
     "monit": "pm2 monit",
-    "delete": "pm2 delete all"
+    "delete": "pm2 delete all && pm2 kill"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "express": "^4.18.2",
     "express-basic-auth": "^1.2.1",
     "helmet": "^7.1.0",
+    "jwt-simple": "^0.5.6",
     "moment": "^2.30.1",
     "morgan": "^1.10.0",
     "mysql2": "^3.9.1",
