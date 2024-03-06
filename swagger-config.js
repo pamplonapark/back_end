@@ -5,7 +5,7 @@ const options = {
     openapi: "3.0.0",
     info: {
       title: "PamplonaPark Documentation",
-      version: "1.0.0",
+      version: "2.1.0",
       description: "Documentation for PamplonaPark",
     }
   },
