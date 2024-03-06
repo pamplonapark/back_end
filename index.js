@@ -7,7 +7,6 @@ const logger = require("./src/internal/functions/logger");
 const app = express();
 const { initMySQLDatabase, closePool } = require("./src/internal/databases/mysql_connector");
 const activateWorkerManager = require("./src/internal/functions/WorkerManager.js");
-const { generateRandomAESKey } = require("./src/internal/functions/crypto");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpecs = require("./swagger-config.js");
 const basicAuth = require('express-basic-auth');
@@ -27,7 +26,7 @@ app.use("/parkings", require("./src/routes/parkings.js"));
 app.use("/accounts", require("./src/routes/accounts.js"));
 
 // Sets the user and password to access swagger documentation
-app.use("/v1/docs", basicAuth({ users: { "admin": process.env.ADMIN_PASSWORD }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // Route for Swagger docs
+app.use("/v1/docs", basicAuth({ users: { "admin": process.env.ADMIN_PASSWORD }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs, { explorer: true })); // Route for Swagger docs
 
 app.use("/v1/dashboard", (req, res) => res.redirect("https://app.pm2.io/")); // Redirection to dashboard
 
@@ -57,8 +56,6 @@ app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, async () => {
   activateWorkerManager();
 
   if (process.env.NODE_ENV == "development") {
-    // insertInitialData();
-    logger.info("Token: " + generateRandomAESKey());
     logger.info("WORKING IN DEVELOPMENT MODE");
   } else logger.info("WORKING IN PRODUCTION MODE");
 

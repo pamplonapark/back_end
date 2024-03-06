@@ -3,7 +3,6 @@ const { requestHTTP } = require("./requests");
 const fs = require("fs");
 const path = require("path");
 const { parentPort } = require("worker_threads");
-const logger = require("./logger");
 const {
   executeQuery,
   initMySQLDatabase,
@@ -75,6 +74,7 @@ const updateUndergroundParkings = async () => {
 
 /**
  * @deprecated - Dev only
+ * Inserts initial data (Parkings and parking prices)
  */
 const insertInitialData = async () => {
   const data = await requestHTTP(
@@ -94,7 +94,7 @@ const insertInitialData = async () => {
 
   const insertData = jsonData.aparcamientos.aparcamiento.map(
     async (element) => {
-      return new Promise(async (resolve) => {
+      new Promise(async (resolve) => {
         resolve(
           await executeQuery(
             "INSERT IGNORE INTO Parkings(id, name, address, hours_active, spots, available_spots, latitude, longitude, telephone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -111,9 +111,26 @@ const insertInitialData = async () => {
             ]
           )
         );
-      });
-    }
-  );
+      }).then(() => {
+        console.log("Parking reviewed: " + element.codigo[0])
+        element.tarifas[0].rango.map((prices) => {
+          new Promise(async (resolve) => {
+            prices.importe[0] = prices.importe[0].replace(",", ".")
+            resolve(
+              await executeQuery(
+                "INSERT IGNORE INTO Parkings_Prices(id_parking, code, description, amount) VALUES (?, ?, ?, ?)",
+                [
+                  element.codigo[0],
+                  prices.codigo[0],
+                  prices.descripcion[0],
+                  prices.importe[0]
+                ]
+              )
+            );
+          });
+        })
+      })
+    });
 
   await Promise.all(insertData);
 };
