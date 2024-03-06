@@ -1,4 +1,6 @@
 const crypto = require("crypto");
+const jwt = require("jwt-simple");
+const moment = require("moment");
 
 /**
  * Encrypts data using AES encryption algorithm.
@@ -7,19 +9,23 @@ const crypto = require("crypto");
  * @returns {[string, ArrayBufferLike, Buffer]} An array containing encrypted data (HEX), initialization vector (IV), and certificate/signature.
  */
 const encrypt_aes = (data) => {
-  let iv = crypto.randomBytes(16);
-  let cipher = crypto.createCipheriv(
-    "aes-256-gcm",
-    Buffer.from(process.env.AES_KEY, "hex"),
-    iv.buffer
-  );
-  let encryptedData = cipher.update(data, "utf8", "hex");
+  try {
+    let iv = crypto.randomBytes(16);
+    let cipher = crypto.createCipheriv(
+      "aes-256-gcm",
+      Buffer.from(process.env.AES_KEY, "hex"),
+      iv.buffer
+    );
+    let encryptedData = cipher.update(data, "utf8", "hex");
 
-  encryptedData += cipher.final("hex");
+    encryptedData += cipher.final("hex");
 
-  let certificate = cipher.getAuthTag();
+    let certificate = cipher.getAuthTag();
 
-  return [encryptedData, iv, certificate];
+    return [encryptedData, iv, certificate];
+  } catch (error) {
+    throw Error("Error al encriptar: " + error.message);
+  }
 };
 
 /**
@@ -31,19 +37,22 @@ const encrypt_aes = (data) => {
  * @returns {string} The decrypted data.
  */
 const decrypt_aes = (data, iv, certificate) => {
-  let decipher = crypto.createDecipheriv(
-    "aes-256-gcm",
-    Buffer.from(process.env.AES_KEY, "hex"),
-    iv
-  );
+  try {
+    let decipher = crypto.createDecipheriv(
+      "aes-256-gcm",
+      Buffer.from(process.env.AES_KEY, "hex"),
+      iv
+    );
 
-  decipher.setAuthTag(certificate);
+    decipher.setAuthTag(certificate);
 
-  let decryptedData = decipher.update(data, "hex", "utf8");
+    let decryptedData = decipher.update(data, "hex", "utf8");
 
-  decryptedData += decipher.final("utf8");
+    decryptedData += decipher.final("utf8");
 
-  return decryptedData;
+    return decryptedData;
+  }
+  catch { return undefined; }
 };
 
 /**
@@ -53,12 +62,46 @@ const decrypt_aes = (data, iv, certificate) => {
  * @returns {string} A randomly generated AES key in HEX format.
  */
 const generateRandomAESKey = () => {
-  if (process.env.ENVIRONMENT == "development")
+  if (process.env.NODE_ENV == "development")
     return crypto.randomBytes(32).toString("hex");
+};
+
+const create_bearer_token = (uuid, password, username) => {
+  let time_max = "hours";
+
+  if (process.env.NODE_ENV == "development") time_max = "years";
+
+  return jwt.encode(
+    {
+      uuid: uuid,
+      password: password,
+      username: username,
+      iat: moment().unix(),
+      exp: moment().add(24, time_max).unix(),
+    },
+    process.env.JWT_TOKEN
+  );
+};
+
+const decode_bearer_token = (bearer_token) => {
+  try {
+    return jwt.decode(bearer_token, process.env.JWT_TOKEN);
+  }
+  catch
+  {
+    return undefined;
+  }
+};
+
+const check_active_bearer = (exp) => {
+  return exp <= moment().unix();
 };
 
 module.exports = {
   decrypt_aes,
   encrypt_aes,
   generateRandomAESKey,
+  create_bearer_token,
+  decode_bearer_token,
+  check_active_bearer
 };

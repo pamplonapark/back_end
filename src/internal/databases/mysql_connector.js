@@ -18,22 +18,12 @@ const initMySQLDatabase = () => {
     pool.removeListener("release");
   }
 
-  let mysql_user = process.env.MYSQL_USER;
-  let mysql_password = process.env.MYSQL_PASSWORD;
-  let mysql_port = process.env.MYSQL_PORT;
-
-  if (process.env.ENVIRONMENT == "development") {
-    mysql_user = process.env.MYSQL_USER_DEV;
-    mysql_password = process.env.MYSQL_PASSWORD_DEV;
-    mysql_port = process.env.MYSQL_PORT_DEV;
-  }
-
   pool = mysql.createPool({
     connectionLimit: 100,
     host: "localhost",
-    port: mysql_port,
-    user: mysql_user,
-    password: mysql_password,
+    port: process.env.MYSQL_PORT,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
     charset: "utf8mb4",
     connectTimeout: 10000,
     dateStrings: false,
@@ -85,17 +75,28 @@ const executeQuery = (sql, values, sub_pool = null) => {
 
   return new Promise(async (resolve, reject) => {
     tem_pool.getConnection((err, connection) => {
-      if (err) logger.log("error", "Error in database connection: " + err);
+      if (err) {
+        logger.log("error", "Error in database connection - " + err)
+        reject(new Error("Error in database connection - " + err))
+      }
 
-      connection.execute(sql, values, (err, results, fields) => {
-        connection.release();
+      try {
+        connection.execute(sql, values, (err, results, fields) => {
+          connection.release();
 
-        if (err) reject(logger.log("error", "Error in SQL execute - " + err));
-        else {
-          logger.log("database", "Query executed correctly - " + sql);
-          resolve([results, fields]);
-        }
-      });
+          if (err) {
+            logger.log("error", "Error in SQL execute - " + err)
+            reject(new Error("Error in SQL execute - " + err))
+          }
+          else {
+            logger.log("database", "Query executed correctly - " + sql);
+            resolve([results, fields]);
+          }
+        });
+      }
+      catch (e) {
+        throw new Error(e.message);
+      }
     });
   });
 };
