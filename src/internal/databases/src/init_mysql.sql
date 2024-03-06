@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS pamplonapark;
 USE pamplonapark;
 
+/* TABLE CREATION */
 /* Log table */
 CREATE TABLE IF NOT EXISTS Logs_ (
 	log_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -43,14 +44,33 @@ CREATE TABLE IF NOT EXISTS Parkings(
 	longitude VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS Parkings_Prices(
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	id_parking BIGINT NOT NULL,
+	code BIGINT NOT NULL,
+	description VARCHAR(255) NOT NULL,
+	amount DECIMAL(65, 30) NOT NULL,
+
+	UNIQUE(id_parking, code)
+);
+
+/* CONSTRAINTS */
 ALTER TABLE User_Favorite ADD CONSTRAINT id_user FOREIGN KEY(id_user) REFERENCES Users_(id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE User_Favorite ADD CONSTRAINT id_favorite FOREIGN KEY(id_favorite) REFERENCES Parkings(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE Parkings_Prices ADD CONSTRAINT id_parking FOREIGN KEY(id) REFERENCES Parkings(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 DROP TRIGGER IF EXISTS add_creation_date;
 DROP TRIGGER IF EXISTS add_modification_date;
 DROP TRIGGER IF EXISTS log_update_user_favorite;
 DROP TRIGGER IF EXISTS log_delete_user_favorite;
+DROP TRIGGER IF EXISTS log_insert_parkings;
+DROP TRIGGER IF EXISTS log_update_parking;
+DROP TRIGGER IF EXISTS log_delete_parking;
+DROP TRIGGER IF EXISTS log_insert_parking_price;
+DROP TRIGGER IF EXISTS log_update_parking_price;
+DROP TRIGGER IF EXISTS log_delete_parking_price;
 
+/* USER_ TABLE MODIFICATION */
 /* Trigger to create log when user inserted */
 DELIMITER %%
 CREATE TRIGGER add_insert_log BEFORE INSERT ON Users_ FOR EACH ROW
@@ -59,7 +79,6 @@ BEGIN
 END %%
 DELIMITER ;
 
-/* USER_ TABLE MODIFICATION */
 /* Trigger to add modification date to user */
 DELIMITER %%
 CREATE TRIGGER add_modification_date BEFORE UPDATE ON Users_ FOR EACH ROW
@@ -69,7 +88,7 @@ BEGIN
 END %%
 DELIMITER ;
 
-/* Trigger to log update of FK to in User_Favorite */
+/* Trigger to create log when user deleted */
 DELIMITER %%
 CREATE TRIGGER log_delete_user BEFORE DELETE ON Users_ FOR EACH ROW
 BEGIN
@@ -99,5 +118,55 @@ DELIMITER %%
 CREATE TRIGGER log_delete_user_favorite BEFORE DELETE ON User_Favorite FOR EACH ROW
 BEGIN
 	INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("User_Favorite", "DELETE", OLD.uuid, CONCAT("Removed user-favorite relation:\nUser: ", OLD.id_user, "\nFavorite: ", OLD.id_favorite));
+END %%
+DELIMITER ;
+
+/* PARKINGS TABLE MODIFICATION */
+/* Trigger to log insert parking */
+DELIMITER %%
+CREATE TRIGGER log_insert_parkings BEFORE INSERT ON Parkings FOR EACH ROW
+BEGIN
+	INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("Parkings", "INSERT", NEW.uuid, "Inserted new parking");
+END %%
+DELIMITER ;
+
+/* Trigger to add updated parking to logs */
+DELIMITER %%
+CREATE TRIGGER log_update_parking BEFORE UPDATE ON Parkings FOR EACH ROW
+BEGIN
+		INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("Parkings", "UPDATE", NEW.uuid, "Updated parking");
+END %%
+DELIMITER ;
+
+/*  Trigger to add deleted parking to logs  */
+DELIMITER %%
+CREATE TRIGGER log_delete_parking BEFORE DELETE ON Parkings FOR EACH ROW
+BEGIN
+		INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("Parkings", "DELETE", OLD.uuid, "Removed parking");
+END %%
+DELIMITER ;
+
+/* PARKINGS_PRICES TABLE MODIFICATION */
+/* Trigger to log insert new price */
+DELIMITER %%
+CREATE TRIGGER log_insert_parking_price BEFORE INSERT ON Parkings_Prices FOR EACH ROW
+BEGIN
+	INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("Parkings_Price", "INSERT", NEW.id, CONCAT("Inserted new parking-price relation:\nParking: ", NEW.id_parking, "\nPrice: ", NEW.id));
+END %%
+DELIMITER ;
+
+/*  Trigger to add updated parking price to logs */
+DELIMITER %%
+CREATE TRIGGER log_update_parking_price BEFORE UPDATE ON Parkings_Prices FOR EACH ROW
+BEGIN
+	INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("Parkings_Price", "UPDATE", NEW.id, CONCAT("Updated parking-price relation:\nNew Parking: ", NEW.id_parking, "\nOld Parking:", OLD.id_parking, "\nNew Price: ", NEW.id, "\nOld Price: ", OLD.id));
+END %%
+DELIMITER ;
+
+/*  Trigger to add deleted parking price to logs */
+DELIMITER %%
+CREATE TRIGGER log_delete_parking_price BEFORE DELETE ON Parkings_Prices FOR EACH ROW
+BEGIN
+	INSERT INTO Logs_(table_affected, action_performed, user_affected, explanation) VALUES("Parkings_Price", "DELETE", OLD.id, CONCAT("Removed user-favorite relation:\nParking: ", OLD.id_parking, "\nPrice: ", OLD.id));
 END %%
 DELIMITER ;

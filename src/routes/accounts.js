@@ -8,31 +8,47 @@ const { Users } = require("../internal/databases/models/Users");
  * @swagger
  * /accounts/register:
  *   post:
- *     summary: Creates a new user / log in a user
- *     description: Creates a user / log in a user
+ *     summary: Register a new user
+ *     description: Registers a new user with the provided username, password, and email
  *     requestBody:
- *      required: true
- *      content:
+ *       required: true
+ *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               info:
+ *                 type: object
+ *                 properties:
+ *                   username:
+ *                     type: string
+ *                     description: The username of the user
+ *                   password:
+ *                     type: string
+ *                     description: The password of the user
+ *                   email:
+ *                     type: string
+ *                     description: The email of the user
+ *               iv:
  *                 type: string
- *                 description: The username of the user
- *               password:
+ *                 description: The initialization vector for AES decryption
+ *               authPath:
  *                 type: string
- *                 description: The password in SHA-512
+ *                 description: The authentication path for AES decryption
+ *             required:
+ *               - info
+ *               - iv
+ *               - authPath
  *     responses:
  *       '200':
- *         description: Creates the user and / or returns a Bearer token
+ *         description: User registered and logged in successfully
  *       '430':
  *         description: Invalid petition, incorrect params
  *       '500':
  *         description: Internal server error
  */
 router.post("/register", async (req, res) => {
-  let body = req.body.info;//decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
+  let body = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
@@ -72,20 +88,13 @@ router.post("/register", async (req, res) => {
  * @swagger
  * /accounts/getPersonalInfo:
  *   get:
- *     summary: Get personal information of a user
- *     description: Retrieves personal information of a user based on username
- *     parameters:
- *       - in: query
- *         name: username
- *         schema:
- *           type: string
- *         required: true
- *         description: The username of the user
+ *     summary: Get Personal Information
+ *     description: Retrieves personal information of the user
  *     responses:
  *       '200':
- *         description: Personal information retrieved successfully
- *       '404':
- *         description: User not found
+ *         description: User's personal information retrieved successfully
+ *       '430':
+ *         description: Invalid authorization key
  *       '500':
  *         description: Internal server error
  */
@@ -122,19 +131,14 @@ router.get("/getPersonalInfo", async (req, res) => {
  * /accounts/getUserFavorites:
  *   get:
  *     summary: Get user's favorite parkings
- *     description: Retrieves the favorite parkings of a user based on user ID
- *     parameters:
- *       - in: query
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the user
+ *     description: Retrieves the favorite parkings of a user based on user UUID
  *     responses:
  *       '200':
  *         description: User's favorite parkings retrieved successfully
  *       '404':
- *         description: User's favorite parkings not found
+ *         description: No parkings found for the user
+ *       '430':
+ *         description: Invalid authorization key
  *       '500':
  *         description: Internal server error
  */
@@ -153,7 +157,7 @@ router.get("/getUserFavorites", async (req, res) => {
     }
     else {
       try {
-        let [results] = await Users.getFavorites(data_from_bearer.username, data_from_bearer.uuid).catch(() => { throw new Error("Error in query searching user_Fav") });
+        let [results] = await Users.getFavorites(data_from_bearer.uuid).catch(() => { throw new Error("Error in query searching user_Fav") });
 
         if (results[0] != undefined) {
           let [data_encrypted, iv, authPath] = encrypt_aes(JSON.stringify(results[0]));
