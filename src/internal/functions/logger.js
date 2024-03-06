@@ -7,6 +7,10 @@ winston.addColors({
   error: "red",
 });
 
+/**
+ * Custom logger setup with Winston.
+ * Logs to console and files with different levels and formats.
+ */
 const logger = winston.createLogger({
   levels: {
     ...winston.config.npm.levels,

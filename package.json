@@ -4,24 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon --config nodemon.json index.js",
-    "start": "node index.js",
-    "test_neo4j": "nodemon --config nodemon.json src/internal/functions/updateUndergroundParkings.js"
+    "dev": "pm2 start ecosystem.config.js --env development && pm2 link zxkn27nslt2t206 5sxb2d2gx554l9i && pm2 monit",
+    "start": "pm2 start ecosystem.config.js --env production && pm2 link zxkn27nslt2t206 5sxb2d2gx554l9i",
+    "logs": "pm2 logs",
+    "list": "pm2 list",
+    "stop": "pm2 kill && pm2 stop all",
+    "reload": "pm2 reload pamplonapark",
+    "monit": "pm2 monit",
+    "delete": "pm2 delete all && pm2 kill"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.6.5",
-    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
     "helmet": "^7.1.0",
+    "jwt-simple": "^0.5.6",
     "moment": "^2.30.1",
     "morgan": "^1.10.0",
     "mysql2": "^3.9.1",
     "neo4j-driver": "^5.17.0",
     "nodemon": "^3.0.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "winston": "^3.11.0",
     "xml2js": "^0.6.2"
   }
