@@ -4,3 +4,4 @@ logs/
 package-lock.*
 src/internal/databases/src/parkings_underground.json
 ecosystem.config.js
+password_root_mysql.txt

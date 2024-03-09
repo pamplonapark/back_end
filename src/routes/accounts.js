@@ -87,7 +87,7 @@ router.post("/register", async (req, res) => {
 /**
  * @swagger
  * /accounts/getPersonalInfo:
- *   get:
+ *   post:
  *     summary: Get Personal Information
  *     description: Retrieves personal information of the user
  *     responses:
@@ -98,30 +98,37 @@ router.post("/register", async (req, res) => {
  *       '500':
  *         description: Internal server error
  */
-router.get("/getPersonalInfo", async (req, res) => {
-  let token = req.headers.authorization;
+router.post("/getPersonalInfo", async (req, res) => {
+  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
-  if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
-
-  if (req.headers.authorization == undefined || req.headers.authorization.split(" ")[1] == undefined) res.status(430).send({ code: 430, message: "You have to add an authorization key" });
+  if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
-    let data_from_bearer = decode_bearer_token(token, req);
+    try {
+      let body_parsed = JSON.parse(body)[0];
 
-    if (data_from_bearer == undefined) {
-      res.status(430).send({ code: 430, message: "Invalid Bearer token" });
-      logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
-    }
-    else {
-      try {
+      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+
+      let token = body_parsed.auth;
+
+      if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
+
+      let data_from_bearer = decode_bearer_token(token);
+
+      if (data_from_bearer == undefined) {
+        res.status(430).send({ code: 430, message: "Invalid Bearer token" });
+        logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
+      }
+      else {
         let [results] = await Users.searchByAuth(data_from_bearer.username, data_from_bearer.uuid).catch(() => { throw new Error("Error in query searching user") });
         let [data_encrypted, iv, authPath] = encrypt_aes(JSON.stringify(results[0]));
 
         res.status(200).send({ code: 200, message: "User retrieved correctly", info: data_encrypted, iv: iv.toString("hex"), authPath: authPath.toString("hex") });
         logger.info(`User retrieved correctly - ${results[0].uuid}`);
-      } catch (error) {
-        res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
-        logger.error(error.message + " for IP - " + req.socket.remoteAddress);
       }
+
+    } catch (error) {
+      res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
+      logger.error(error.message + " for IP - " + req.socket.remoteAddress);
     }
   }
 });
@@ -142,21 +149,27 @@ router.get("/getPersonalInfo", async (req, res) => {
  *       '500':
  *         description: Internal server error
  */
-router.get("/getUserFavorites", async (req, res) => {
-  let token = req.headers.authorization;
+router.post("/getUserFavorites", async (req, res) => {
+  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
-  if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
-
-  if (req.headers.authorization == undefined || req.headers.authorization.split(" ")[1] == undefined) res.status(430).send({ code: 430, message: "You have to add an authorization key" });
+  if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
-    let data_from_bearer = decode_bearer_token(token, req);
+    try {
+      let body_parsed = JSON.parse(body)[0];
 
-    if (data_from_bearer == undefined) {
-      res.status(430).send({ code: 430, message: "Invalid Bearer token" });
-      logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
-    }
-    else {
-      try {
+      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+
+      let token = body_parsed.auth;
+
+      if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
+
+      let data_from_bearer = decode_bearer_token(token);
+
+      if (data_from_bearer == undefined) {
+        res.status(430).send({ code: 430, message: "Invalid Bearer token" });
+        logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
+      }
+      else {
         let [results] = await Users.getFavorites(data_from_bearer.uuid).catch(() => { throw new Error("Error in query searching user_Fav") });
 
         if (results[0] != undefined) {
@@ -166,10 +179,10 @@ router.get("/getUserFavorites", async (req, res) => {
           logger.info(`User_Fav retrieved correctly - ${data_from_bearer.uuid}`);
         }
         else res.status(404).send({ code: 404, message: "No parkings found for this user" });
-      } catch (error) {
-        res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
-        logger.error(error.message + " for IP - " + req.socket.remoteAddress);
       }
+    } catch (error) {
+      res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
+      logger.error(error.message + " for IP - " + req.socket.remoteAddress);
     }
   }
 });
