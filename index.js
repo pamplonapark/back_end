@@ -10,6 +10,7 @@ const activateWorkerManager = require("./src/internal/functions/WorkerManager.js
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpecs = require("./swagger-config.js");
 const basicAuth = require('express-basic-auth');
+const { insertInitialData } = require("./src/internal/functions/updateUndergroundParkings");
 
 app.use(helmet()); // Set various HTTP headers for security
 app.use(bodyParser.json()); // Parse incoming JSON requests
@@ -26,7 +27,7 @@ app.use("/parkings", require("./src/routes/parkings.js"));
 app.use("/accounts", require("./src/routes/accounts.js"));
 
 // Sets the user and password to access swagger documentation
-app.use("/v1/docs", basicAuth({ users: { "admin": process.env.ADMIN_PASSWORD }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs, { explorer: true })); // Route for Swagger docs
+app.use("/v1/docs", basicAuth({ users: { "admin": process.env.ADMIN_PASSWORD }, challenge: true }), swaggerUi.serve, swaggerUi.setup(swaggerSpecs, { explorer: true, customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css" })); // Route for Swagger docs
 
 app.use("/v1/dashboard", (req, res) => res.redirect("https://app.pm2.io/")); // Redirection to dashboard
 
@@ -56,6 +57,7 @@ app.listen(process.env.SERVER_PORT, process.env.SERVER_IP, async () => {
   activateWorkerManager();
 
   if (process.env.NODE_ENV == "development") {
+    insertInitialData()
     logger.info("WORKING IN DEVELOPMENT MODE");
   } else logger.info("WORKING IN PRODUCTION MODE");
 

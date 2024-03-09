@@ -20,21 +20,27 @@ const { Parkings } = require("../internal/databases/models/Parkings");
  *       '500':
  *         description: Internal server error
  */
-router.get("/getAll", async (req, res) => {
-  let token = req.headers.authorization;
+router.post("/getAll", async (req, res) => {
+  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
-  if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
-
-  if (req.headers.authorization == undefined || req.headers.authorization.split(" ")[1] == undefined) res.status(430).send({ code: 430, message: "You have to add an authorization key" });
+  if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
-    let data_from_bearer = decode_bearer_token(token, req);
+    try {
+      let body_parsed = JSON.parse(body)[0];
 
-    if (data_from_bearer == undefined) {
-      res.status(430).send({ code: 430, message: "Invalid Bearer token" });
-      logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
-    }
-    else {
-      try {
+      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+
+      let token = body_parsed.auth;
+
+      if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
+
+      let data_from_bearer = decode_bearer_token(token);
+
+      if (data_from_bearer == undefined) {
+        res.status(430).send({ code: 430, message: "Invalid Bearer token" });
+        logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
+      }
+      else {
         let [results] = await Parkings.getAll().catch(() => { throw new Error("Error in query searching all parkings") });
 
         if (results[0] != undefined) {
@@ -42,10 +48,10 @@ router.get("/getAll", async (req, res) => {
           logger.info(`Parkings retrieved correctly`);
         }
         else res.status(404).send({ code: 404, message: "No parkings found, please try again later" });
-      } catch (error) {
-        res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
-        logger.error(error.message + " for IP - " + req.socket.remoteAddress);
       }
+    } catch (error) {
+      res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
+      logger.error(error.message + " for IP - " + req.socket.remoteAddress);
     }
   }
 });
@@ -74,21 +80,27 @@ router.get("/getAll", async (req, res) => {
  *         description: Internal server error
  */
 router.get("/getByUUID", async (req, res) => {
-  let token = req.headers.authorization;
+  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
-  if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
-
-  if (req.headers.authorization == undefined || req.headers.authorization.split(" ")[1] == undefined) res.status(430).send({ code: 430, message: "You have to add an authorization key" });
+  if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
-    let data_from_bearer = decode_bearer_token(token, req);
+    try {
+      let body_parsed = JSON.parse(body)[0];
 
-    if (data_from_bearer == undefined) {
-      res.status(430).send({ code: 430, message: "Invalid Bearer token" });
-      logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
-    }
-    else if (req.query.uuid == undefined) res.status(430).send({ code: 430, message: "You have to add a uuid" });
-    else {
-      try {
+      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+
+      let token = body_parsed.auth;
+
+      if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
+
+      let data_from_bearer = decode_bearer_token(token);
+
+      if (data_from_bearer == undefined) {
+        res.status(430).send({ code: 430, message: "Invalid Bearer token" });
+        logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
+      }
+      else if (req.query.uuid == undefined) res.status(430).send({ code: 430, message: "You have to add a uuid" });
+      else {
         let [results] = await Parkings.getByUUID(req.query.uuid).catch(() => { throw new Error("Error in query searching all parkings") });
 
         if (results[0] != undefined) {
@@ -96,10 +108,10 @@ router.get("/getByUUID", async (req, res) => {
           logger.info(`Parking retrieved correctly - ${req.query.uuid}`);
         }
         else res.status(404).send({ code: 404, message: "No parkings found, please try again later" });
-      } catch (error) {
-        res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
-        logger.error(error.message + " for IP - " + req.socket.remoteAddress);
       }
+    } catch (error) {
+      res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
+      logger.error(error.message + " for IP - " + req.socket.remoteAddress);
     }
   }
 });
@@ -128,21 +140,27 @@ router.get("/getByUUID", async (req, res) => {
  *         description: Internal server error
  */
 router.get("/getPriceByUUID", async (req, res) => {
-  let token = req.headers.authorization;
+  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
-  if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
-
-  if (req.headers.authorization == undefined || req.headers.authorization.split(" ")[1] == undefined) res.status(430).send({ code: 430, message: "You have to add an authorization key" });
+  if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
-    let data_from_bearer = decode_bearer_token(token, req);
+    try {
+      let body_parsed = JSON.parse(body)[0];
 
-    if (data_from_bearer == undefined) {
-      res.status(430).send({ code: 430, message: "Invalid Bearer token" });
-      logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
-    }
-    else if (req.query.uuid == undefined) res.status(430).send({ code: 430, message: "You have to add a uuid" });
-    else {
-      try {
+      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+
+      let token = body_parsed.auth;
+
+      if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
+
+      let data_from_bearer = decode_bearer_token(token);
+
+      if (data_from_bearer == undefined) {
+        res.status(430).send({ code: 430, message: "Invalid Bearer token" });
+        logger.error("Impossible to decode Bearer Token for IP - " + req.socket.remoteAddress);
+      }
+      else if (req.query.uuid == undefined) res.status(430).send({ code: 430, message: "You have to add a uuid" });
+      else {
         let [results] = await Parkings.getPriceByUUID(req.query.uuid).catch(() => { throw new Error("Error in query searching all parkings prices") });
 
         if (results[0] != undefined) {
@@ -150,10 +168,10 @@ router.get("/getPriceByUUID", async (req, res) => {
           logger.info(`Parking prices retrieved correctly - ${req.query.uuid}`);
         }
         else res.status(404).send({ code: 404, message: "No parkings found, please try again later" });
-      } catch (error) {
-        res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
-        logger.error(error.message + " for IP - " + req.socket.remoteAddress);
       }
+    } catch (error) {
+      res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
+      logger.error(error.message + " for IP - " + req.socket.remoteAddress);
     }
   }
 });
