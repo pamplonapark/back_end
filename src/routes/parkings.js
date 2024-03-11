@@ -26,7 +26,7 @@ router.post("/getAll", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body)[0];
+      let body_parsed = body
 
       if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
 
@@ -85,7 +85,7 @@ router.get("/getByUUID", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body)[0];
+      let body_parsed = body
 
       if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
 
@@ -145,7 +145,7 @@ router.get("/getPriceByUUID", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body)[0];
+      let body_parsed = body
 
       if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
 

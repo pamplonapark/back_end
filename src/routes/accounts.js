@@ -49,11 +49,10 @@ const { Users } = require("../internal/databases/models/Users");
  */
 router.post("/register", async (req, res) => {
   let body = req.body.info//decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
-
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body)[0];
+      let body_parsed = body
 
       if (!body_parsed.email || !body_parsed.password || !body_parsed.username) throw Error("Invalid args (undefined for some args)");
 
@@ -84,7 +83,7 @@ router.post("/login", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body);
+      let body_parsed = body
 
       if (!body_parsed.password || !body_parsed.username) throw Error("Invalid args (undefined for some args)");
 
@@ -131,7 +130,7 @@ router.post("/getPersonalInfo", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body);
+      let body_parsed = body
 
       if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
 
@@ -182,7 +181,7 @@ router.post("/getUserFavorites", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body);
+      let body_parsed = body
 
       if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
 
