@@ -69,7 +69,34 @@ router.post("/register", async (req, res) => {
         });
       }
       else {
-        let [results] = await Users.validateUser(body_parsed.username, body_parsed.password, body_parsed.email).catch(() => { throw new Error("Error verifying if user is registered") });
+        res.status(430).send({ code: 430, message: "User already created" });
+      }
+    } catch (error) {
+      res.status(500).send({ code: 500, message: "Internal server error - Contact an administrator" });
+      logger.error(error.message + " for IP - " + req.socket.remoteAddress);
+    }
+  }
+});
+
+router.post("/login", async (req, res) => {
+  let body = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
+
+  if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
+  else {
+    try {
+      let body_parsed = JSON.parse(body)[0];
+
+      if (!body_parsed.password || !body_parsed.username) throw Error("Invalid args (undefined for some args)");
+
+      let [results] = await Users.searchUser(body_parsed.username).catch(() => { throw new Error("Error verifying if user is registered") });
+
+      /* If user do not exist, creates it */
+      if (results.length == 0) {
+        res.status(430).send({ code: 430, message: "Invalid credentials" });
+        logger.info(`User created and logged correctly - ${results[0].uuid}`);
+      }
+      else {
+        let [results] = await Users.validateUser(body_parsed.username, body_parsed.password).catch(() => { throw new Error("Error verifying if user is registered") });
 
         if (results.length == 0) res.status(430).send({ code: 430, message: "Invalid credentials: User / Password" });
         else {
