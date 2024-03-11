@@ -12,8 +12,8 @@ class Users {
 	  * @param {string} email - The email of the user.
 	  * @returns {Promise<Array>} A Promise that resolves to the user data if validation succeeds.
 	  */
-	static validateUser = async (username, password, email) => {
-		let result = await executeQuery("SELECT * FROM Users_ WHERE username = ? AND password_ = ? AND email = ?", [username, password, email]);
+	static validateUser = async (username, password) => {
+		let result = await executeQuery("SELECT * FROM Users_ WHERE username = ? AND password_ = ?", [username, password]);
 		return result;
 	}
 
