@@ -21,7 +21,7 @@ const { Parkings } = require("../internal/databases/models/Parkings");
  *         description: Internal server error
  */
 router.post("/getAll", async (req, res) => {
-  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
+  let body = req.body.auth//decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
@@ -80,7 +80,7 @@ router.post("/getAll", async (req, res) => {
  *         description: Internal server error
  */
 router.get("/getByUUID", async (req, res) => {
-  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
+  let body = req.body.auth//decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
@@ -140,7 +140,7 @@ router.get("/getByUUID", async (req, res) => {
  *         description: Internal server error
  */
 router.get("/getPriceByUUID", async (req, res) => {
-  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
+  let body = req.body.auth//decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {

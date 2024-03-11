@@ -48,7 +48,7 @@ const { Users } = require("../internal/databases/models/Users");
  *         description: Internal server error
  */
 router.post("/register", async (req, res) => {
-  let body = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
+  let body = req.body.info//decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
@@ -79,7 +79,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  let body = decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
+  let body = req.body.info//decrypt_aes(req.body.info, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
@@ -126,7 +126,7 @@ router.post("/login", async (req, res) => {
  *         description: Internal server error
  */
 router.post("/getPersonalInfo", async (req, res) => {
-  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
+  let body = req.body.auth//decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
@@ -177,7 +177,7 @@ router.post("/getPersonalInfo", async (req, res) => {
  *         description: Internal server error
  */
 router.post("/getUserFavorites", async (req, res) => {
-  let body = decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
+  let body = req.body.auth//decrypt_aes(req.body.auth, req.body.iv, req.body.authPath);
 
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
