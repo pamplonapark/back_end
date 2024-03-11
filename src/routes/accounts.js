@@ -132,9 +132,9 @@ router.post("/getPersonalInfo", async (req, res) => {
     try {
       let body_parsed = body
 
-      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+      if (!body_parsed) throw Error("Invalid args (undefined for some args)");
 
-      let token = body_parsed.auth;
+      let token = body_parsed;
 
       if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
 
@@ -183,9 +183,9 @@ router.post("/getUserFavorites", async (req, res) => {
     try {
       let body_parsed = body
 
-      if (!body_parsed.auth) throw Error("Invalid args (undefined for some args)");
+      if (!body_parsed) throw Error("Invalid args (undefined for some args)");
 
-      let token = body_parsed.auth;
+      let token = body_parsed;
 
       if (process.env.NODE_ENV == "development") token = process.env.DEFAULT_BEARER;
 
