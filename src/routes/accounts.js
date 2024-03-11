@@ -53,7 +53,7 @@ router.post("/register", async (req, res) => {
   if (body == undefined) res.status(430).send({ code: 430, message: "Invalid petition, incorrect params" })
   else {
     try {
-      let body_parsed = JSON.parse(body);
+      let body_parsed = JSON.parse(body)[0];
 
       if (!body_parsed.email || !body_parsed.password || !body_parsed.username) throw Error("Invalid args (undefined for some args)");
 
